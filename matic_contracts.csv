@@ -1,0 +1,18 @@
+platform,contract,points,memo
+USDC Token,0x2791bca1f2de4661ed88a30c99a7a9449aa84174,1,"USDC holder, you are playing it safe!"
+Uni Token,0xb33eaad8d922b1083446dc23f610c2567fb5180f,1,Uniswap unicorn!
+wBTC Token,0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6,1,Supporting the Bitcoin migration I see!
+DAI Token,0x8f3cf7ad23cd3cadbd9735aff958023239c6a063,1,DAI Holder!
+Aave Token,0xd6df932a45c0f255f85145f286ea0b292b21c90b,1,Aave Holder!
+Sushiswap Token,0x0b3f868e0be5597d5db7feb59e1cadbb0fdda50a,1,Sushi Holder!
+COMP Token,0x8505b9d2254a7ae468c0e9dd10ccea3a837aef5c,1,COMP Holder!
+CRV Token,0x172370d5cd63279efa6d502dab29171933a610af,1,CRV Holder!
+YFI Token,0xda537104d6a5edd53c6fbba9a898708e465260b6,1,YFI Holder!
+QuickSwap Token,0x831753dd7087cac61ab5644b308642cc1c33dc13,1,Quickswap holder!
+Synthetix Token,0x50b728d8d964fd00c2d0aad81718b71311fef68a,1,SNX holder!
+QuickSwap Router,0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff,5,You are one of those Quickswappers!
+VRFCoordinator,0x3d2341adb2d31f1c5530cdc622016af293177ae0,20,Calling a Verifiable Random Function? Building something cool?
+TokenizedTweets,0x7ee256bdee18870320666bb61dd3c33c64025c78,20,Tokenzing Mints I see!
+DogeColors,0x8a320CE7CE2C0c592f33e05d14b00Bf6d58660F9,20,Oooo DogeColors…what color did you get?
+DXswapRouter,0xad340d0cd0b117b0140671e7cb39770e7675c848,20,DX Swap user…nice!
+InstaIndex,0xA9B99766E6C676Cf1975c0D3166F96C0848fF5ad,20,InstaDapp DeFi Smart Accounts tinkerer

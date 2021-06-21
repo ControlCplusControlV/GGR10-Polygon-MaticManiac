@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Matic Maniac</title>
+    <link rel="stylesheet" type="text/css" href="style.css" media=”screen” />
+</head>
+<style>
+    body {
+        background-image: url('dashboard.png');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+        color: black;
+        font-size: 20px;  
+    }
+    @font-face {
+        font-family: 'Roboto';
+        src: url('https://fonts.googleapis.com/css?family=Roboto:400,700,700italic,400italic&subset=latin,cyrillic');
+    }
+    .center {
+        margin-left: auto;
+        margin-right: auto;
+}
+</style>
+<body style="background-image: url('dashboard.png');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            color: black;
+            font-size: 20px; ">
+    <h1 style="text-align: center;">MATIC MANIAC</h1>
+    <p style="text-align: center;">Matic Maniac is a place to rate your wallet and recieve a score based on your activity within the Polygon Network. Wallets with higher scores are more active and have done a larger variety of things than wallets with lower scores. Enter your wallet below and see where you stand, there are even achievements you can earn by participanting in various ways across the MATIC/Polygon Network.<br /><br /></p>
+    <p style="text-align: center;">The total Maniac Score for this wallet is {{.TotalScore}}</p>
+    <table style="height: 36px; width: 343px;" border="1", class="center">
+    <tbody>
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">Achievement Name</td>
+        <td style="height: 18px; width: 71.7667px; text-align: center;">Point Value</td>
+        <td style="height: 18px; width: 72.4667px; text-align: center;">Earned</td>
+    </tr>
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">Fresh Start!</td>
+        <td style="text-align: center; height: 18px; width: 71.7667px;">55</td>
+        <td style="height: 18px; width: 72.4667px;"><div>{{.FreshStart}}</div></td>
+    </tr>
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">NFT Holder</td>
+        <td style="text-align: center; height: 18px; width: 71.7667px;">10</td>
+        <td style="height: 18px; width: 72.4667px;"><div>{{.NFTHolder}}</div></td>
+    </tr>
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">NFT Holder</td>
+        <td style="text-align: center; height: 18px; width: 71.7667px;">25</td>
+        <td style="height: 18px; width: 72.4667px;"><div>{{.NFTCollector}}</div></td>
+    </tr>
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">Reciever</td>
+        <td style="text-align: center; height: 18px; width: 71.7667px;">25</td>
+        <td style="height: 18px; width: 72.4667px;"><div>{{.Reciever}}</div></td>
+    </tr>
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">Giver</td>
+        <td style="text-align: center; height: 18px; width: 71.7667px;">25</td>
+        <td style="height: 18px; width: 72.4667px;"><div>{{.Giver}}</div></td>
+    </tr>
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">Zen</td>
+        <td style="text-align: center; height: 18px; width: 71.7667px;">100</td>
+        <td style="height: 18px; width: 72.4667px;"><div>{{.Zen}}</div></td>
+    </tr>
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">Token Connoisseur</td>
+        <td style="text-align: center; height: 18px; width: 71.7667px;">100</td>
+        <td style="height: 18px; width: 72.4667px;"><div>{{.Token_connoisseur}}</div></td>
+    </tr>
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">Top 10,000 MATIC Holder</td>
+        <td style="text-align: center; height: 18px; width: 71.7667px;">100</td>
+        <td style="height: 18px; width: 72.4667px;"><div>{{.Toptenk}}</div></td>
+    </tr>
+    </tbody>
+    </table>
+</body>
+</html>
