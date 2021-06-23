@@ -193,7 +193,8 @@ func getscore(address string) achievements {
 	return trophycase
 }
 func hostpage() {
-	http.HandleFunc("/", ShowDashboard)
+	http.HandleFunc("/", ShowLanding)
+	http.HandleFunc("/matic", ShowDashboard)
 	http.ListenAndServe(":8080", nil)
 }
 func hello(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -223,6 +224,14 @@ func ShowDashboard(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	tmpl.Execute(w, walletach)
+}
+func ShowLanding(w http.ResponseWriter, r *http.Request) {
+	fp := path.Join("templates", "landing.html")
+	tmpl, err := template.ParseFiles(fp)
+	if err != nil {
+		fmt.Println(err)
+	}
+	tmpl.Execute(w, nil)
 }
 func main() {
 	hostpage()
