@@ -192,7 +192,9 @@ func getscore(address string) achievements {
 	trophycase.TotalScore = currentscore
 	return trophycase
 }
-func hostpage() {
+func main() {
+	fs := http.FileServer(http.Dir("static/"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", ShowLanding)
 	http.HandleFunc("/matic", ShowDashboard)
 	http.ListenAndServe(":8080", nil)
@@ -232,7 +234,4 @@ func ShowLanding(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	tmpl.Execute(w, nil)
-}
-func main() {
-	hostpage()
 }
