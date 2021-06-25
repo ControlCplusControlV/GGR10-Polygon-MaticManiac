@@ -97,7 +97,7 @@ func getscore(address string) achievements {
 		trophycase.FreshStart = true
 		for index := 0; index < len(txlist)-1; index++ {
 			var currenttx = txlist[index].(map[string]interface{})
-			if currenttx["to"] == "0xf2236990210083b58091966423349f17FCA486FF" {
+			if currenttx["to"] == address {
 				rtx++
 				if addrweightmap[currenttx["from"].(string)] != nil {
 					i, err := strconv.Atoi(addrweightmap[currenttx["from"].(string)].(string))
