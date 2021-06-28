@@ -185,7 +185,7 @@ func getscore(address string) achievements {
 	} else if rtx > stx {
 		currentscore = currentscore + 50 //Reciever
 		trophycase.Reciever = true
-	} else if rtx == stx {
+	} else if rtx == stx && rtx >= 1{
 		currentscore = currentscore + 100 //Zen
 		trophycase.Zen = true
 	}
