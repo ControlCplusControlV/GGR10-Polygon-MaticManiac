@@ -10,8 +10,6 @@ import (
 	"os"
 	"path"
 	"strconv"
-
-	"github.com/zenazn/goji/web"
 )
 
 const API_KEY string = "9YFMVZHI4IHDB1B3VSAQAUHTI7GUH5G5YI"
@@ -44,6 +42,22 @@ func getERC721(address string) []interface{} {
 	return httpget("https://api.polygonscan.com/api?module=account&action=tokentx&address=" + address + "&sort=asc&apikey=" + API_KEY).([]interface{})
 }
 
+func removeDuplicateValues(strSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+
+	// If the key(values of the slice) is not equal
+	// to the already present value in new slice (list)
+	// then we append it. else we jump on another element.
+	for _, entry := range strSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
 type achievements struct {
 	Toptenk           bool
 	Token_connoisseur bool
@@ -54,6 +68,7 @@ type achievements struct {
 	Zen               bool
 	FreshStart        bool
 	TotalScore        int
+	Coinblurb         []string
 }
 
 func getscore(address string) achievements {
@@ -67,6 +82,7 @@ func getscore(address string) achievements {
 		Zen:               false,
 		FreshStart:        false,
 		TotalScore:        0,
+		Coinblurb:         []string{},
 	}
 	var txlist []interface{} = getNormaltx(address)
 	var Erc20 []interface{} = getERC20(address)
@@ -85,9 +101,13 @@ func getscore(address string) achievements {
 		a mapping of an address to a weight
 	*/
 	var addrweightmap map[string]interface{}
+	var blurbmap map[string]interface{}
+	var memblurbs []string
+	blurbmap = make(map[string]interface{})
 	addrweightmap = make(map[string]interface{})
 	for index := 1; index < 15; index++ {
-		addrweightmap[records[index][1]] = records[1][2]
+		addrweightmap[records[index][1]] = records[index][2]
+		blurbmap[records[index][1]] = records[index][3]
 	}
 	var currentscore int
 	var rtx int // Not that rtx recieved transactions
@@ -140,6 +160,7 @@ func getscore(address string) achievements {
 		if addrweightmap[currenttx["contractAddress"].(string)] != nil {
 			uniquetokens[addrweightmap[currenttx["contractAddress"].(string)].(string)] = true
 			i, err := strconv.Atoi(addrweightmap[currenttx["contractAddress"].(string)].(string))
+			memblurbs = append(memblurbs, blurbmap[currenttx["contractAddress"].(string)].(string))
 			if err != nil {
 				fmt.Println("Weird Conversion")
 			}
@@ -185,11 +206,12 @@ func getscore(address string) achievements {
 	} else if rtx > stx {
 		currentscore = currentscore + 50 //Reciever
 		trophycase.Reciever = true
-	} else if rtx == stx && rtx >= 1{
+	} else if rtx == stx && rtx >= 1 {
 		currentscore = currentscore + 100 //Zen
 		trophycase.Zen = true
 	}
 	trophycase.TotalScore = currentscore
+	trophycase.Coinblurb = removeDuplicateValues(memblurbs)
 	return trophycase
 }
 func main() {
@@ -198,17 +220,6 @@ func main() {
 	http.HandleFunc("/", ShowLanding)
 	http.HandleFunc("/matic", ShowDashboard)
 	http.ListenAndServe(":8080", nil)
-}
-func hello(c web.C, w http.ResponseWriter, r *http.Request) {
-
-	//Call to ParseForm makes form fields available.
-	err := r.ParseForm()
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	name := r.PostFormValue("name")
-	fmt.Fprintf(w, "Hello, %s!", name)
 }
 func ShowDashboard(w http.ResponseWriter, r *http.Request) {
 	keys, ok := r.URL.Query()["wallet"]
@@ -225,6 +236,7 @@ func ShowDashboard(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	fmt.Println(walletach.Coinblurb)
 	tmpl.Execute(w, walletach)
 }
 func ShowLanding(w http.ResponseWriter, r *http.Request) {
