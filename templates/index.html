@@ -86,6 +86,15 @@
         <td style="text-align: center; height: 18px; width: 71.7667px;">100</td>
     </tr>
     {{ else }} {{ end }}
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">Top 10,000 MATIC Holder</td>
+        <td style="text-align: center; height: 18px; width: 71.7667px;">100</td>
+    </tr>
+    {{ range .Coinblurb }}
+    <tr style="height: 18px;">
+        <td style="height: 18px; width: 176.767px;">{{.}}</td>
+    </tr>
+    {{ end }}
     </tbody>
     </table>
 </body>
