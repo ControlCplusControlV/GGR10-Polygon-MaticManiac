@@ -35,64 +35,51 @@
     <tbody>
         
     <tr style="height: 18px;font-weight: bold;">
-        <td style="height: 18px; width: 176.767px;">Achievement Name</td>
-        <td style="height: 18px; width: 71.7667px; text-align: center;">Point Value</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">Achievement Name</td>
     </tr>
     {{ if .FreshStart }} 
     <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">Fresh Start!</td>
-        <td style="text-align: center; height: 18px; width: 71.7667px;">55</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">Fresh Start!</td>
     </tr>
     {{ else }} {{ end }}
     {{ if .NFTHolder }} 
     <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">NFT Holder</td>
-        <td style="text-align: center; height: 18px; width: 71.7667px;">10</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">NFT Holder</td>
     </tr>
     {{ else }} {{ end }}
     {{ if .NFTCollector }} 
     <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">NFT Collector</td>
-        <td style="text-align: center; height: 18px; width: 71.7667px;">25</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">NFT Collector</td>
     </tr>
     {{ else }} {{ end }}
     {{ if .Reciever }} 
     <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">Reciever</td>
-        <td style="text-align: center; height: 18px; width: 71.7667px;">25</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">Reciever</td>
     </tr>
     {{ else }} {{ end }}
     {{ if .Giver }} 
     <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">Giver</td>
-        <td style="text-align: center; height: 18px; width: 71.7667px;">25</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">Giver</td>
     </tr>
     {{ else }} {{ end }}
     {{ if .Zen }} 
     <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">Zen</td>
-        <td style="text-align: center; height: 18px; width: 71.7667px;">100</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">Zen</td>
     </tr>
     {{ else }} {{ end }}
     {{ if .Token_connoisseur }} 
     <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">Token Connoisseur</td>
-        <td style="text-align: center; height: 18px; width: 71.7667px;">100</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">Token Connoisseur</td>
     </tr>
     {{ else }} {{ end }}
     {{ if .Toptenk }} 
     <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">Top 10,000 MATIC Holder</td>
-        <td style="text-align: center; height: 18px; width: 71.7667px;">100</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">Top 10,000 MATIC Holder</td>
     </tr>
     {{ else }} {{ end }}
-    <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">Top 10,000 MATIC Holder</td>
-        <td style="text-align: center; height: 18px; width: 71.7667px;">100</td>
-    </tr>
     {{ range .Coinblurb }}
     <tr style="height: 18px;">
-        <td style="height: 18px; width: 176.767px;">{{.}}</td>
+        <td style="height: 18px; width: 176.767px;text-align: center;">{{.}}</td>
     </tr>
     {{ end }}
     </tbody>
