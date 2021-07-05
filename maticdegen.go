@@ -4,12 +4,14 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"io/ioutil"
+	"math/big"
 	"net/http"
 	"os"
 	"path"
 	"strconv"
+	"strings"
+	"text/template"
 )
 
 const API_KEY string = "9YFMVZHI4IHDB1B3VSAQAUHTI7GUH5G5YI"
@@ -28,18 +30,36 @@ func httpget(_url string) interface{} {
 	json.Unmarshal([]byte(string(body)), &result)
 	return result["result"].(interface{})
 }
-
-func getBalance(address string) string {
-	return httpget("https://api.polygonscan.com/api?module=account&action=balance&address=" + address + "&tag=latest&apikey=" + API_KEY).(string)
+func getERC20(address string) []interface{} {
+	return httpget("https://api.polygonscan.com/api?module=account&action=tokentx&address=" + address + "&apikey=" + API_KEY).([]interface{})
 }
 func getNormaltx(address string) []interface{} {
 	return httpget("https://api.polygonscan.com/api?module=account&action=txlist&address=" + address + "&tag=latest&apikey=" + API_KEY).([]interface{})
 }
-func getERC20(address string) []interface{} {
-	return httpget("https://api.polygonscan.com/api?module=account&action=tokentx&address=" + address + "&apikey=" + API_KEY).([]interface{})
-}
 func getERC721(address string) []interface{} {
 	return httpget("https://api.polygonscan.com/api?module=account&action=tokentx&address=" + address + "&sort=asc&apikey=" + API_KEY).([]interface{})
+}
+func getBalance(address string) *big.Int {
+	var balance string = httpget("https://api.polygonscan.com/api?module=account&action=balance&address=" + address + "&tag=latest&apikey=" + API_KEY).(string)
+	intbalance := new(big.Int)
+	intbalance, ok := intbalance.SetString(balance, 10)
+	if !ok {
+		fmt.Print("Error parsing bal")
+	}
+	return intbalance
+}
+
+type achievements struct {
+	Toptenk           bool
+	Token_connoisseur bool
+	NFTHolder         bool
+	NFTCollector      bool
+	Reciever          bool
+	Giver             bool
+	Zen               bool
+	FreshStart        bool
+	TotalScore        int
+	Coinblurb         []string
 }
 
 func removeDuplicateValues(strSlice []string) []string {
@@ -57,21 +77,8 @@ func removeDuplicateValues(strSlice []string) []string {
 	}
 	return list
 }
-
-type achievements struct {
-	Toptenk           bool
-	Token_connoisseur bool
-	NFTHolder         bool
-	NFTCollector      bool
-	Reciever          bool
-	Giver             bool
-	Zen               bool
-	FreshStart        bool
-	TotalScore        int
-	Coinblurb         []string
-}
-
 func getscore(address string) achievements {
+	var wallet string = strings.ToLower(address)
 	trophycase := achievements{
 		Toptenk:           false,
 		Token_connoisseur: false,
@@ -84,136 +91,110 @@ func getscore(address string) achievements {
 		TotalScore:        0,
 		Coinblurb:         []string{},
 	}
-	var txlist []interface{} = getNormaltx(address)
-	var Erc20 []interface{} = getERC20(address)
-	var Erc721 []interface{} = getERC721(address)
-	var walletMatic string = getBalance(address)
-	// Now that data is collected, its time to load in the csv
+	/*
+		Declare some tracking variables among other things
+	*/
+	var stx int = 0
+	var rtx int = 0
+	var maniacScore int = 0
+	var Erc20 []interface{} = getERC20(wallet)
+	var txlist []interface{} = getNormaltx(wallet)
+	var ERC721 []interface{} = getERC721(wallet)
+	var Coinblurb []string
+	var NFTcount map[string]bool = make(map[string]bool)
+	var uniquetokens map[string]bool = make(map[string]bool)
+	// Read through the csv and get scores
 	file, err := os.Open("matic_contracts.csv")
 	if err != nil {
 		fmt.Println(err)
 	}
 	reader := csv.NewReader(file)
 	records, _ := reader.ReadAll()
-
-	/*
-		The following reads through the csv adding contract pairs into
-		a mapping of an address to a weight
-	*/
-	var addrweightmap map[string]interface{}
-	var blurbmap map[string]interface{}
-	var memblurbs []string
-	blurbmap = make(map[string]interface{})
-	addrweightmap = make(map[string]interface{})
-	for index := 1; index < 15; index++ {
-		addrweightmap[records[index][1]] = records[index][2]
-		blurbmap[records[index][1]] = records[index][3]
+	// With All Scores collected, its time to sift through the data
+	var addrweightmap map[string]int = make(map[string]int)
+	var coinblurbmmap map[string]string = make(map[string]string)
+	for index := 1; index < 17; index++ {
+		ivalue, err := strconv.Atoi(records[index][2])
+		if err != nil {
+			fmt.Println(err)
+		}
+		addrweightmap[records[index][1]] = ivalue
+		coinblurbmmap[records[index][1]] = records[index][3]
 	}
-	var currentscore int
-	var rtx int // Not that rtx recieved transactions
-	var stx int
-	if len(txlist) > 1 {
-		currentscore = currentscore + 10
+	/*
+		Get the Maniac score earned from interacting with ERC20 Tokens
+	*/
+	if len(Erc20) >= 1 {
+		for index := 0; index <= len(Erc20)-1; index++ {
+			var currenttx = Erc20[index].(map[string]interface{})
+			var weight int = addrweightmap[currenttx["contractAddress"].(string)]
+			maniacScore += weight
+			uniquetokens["contractAddress"] = true
+			if weight > 0 {
+				Coinblurb = append(Coinblurb, coinblurbmmap[currenttx["contractAddress"].(string)])
+			}
+		}
+		if len(uniquetokens) > 9 {
+			maniacScore += 100
+			trophycase.Token_connoisseur = true
+		}
+	}
+	/*
+		Next get Maniac Score from just regular transactions
+	*/
+	if len(txlist) >= 1 {
+		maniacScore += 10 // Fresh Start
 		trophycase.FreshStart = true
-		for index := 0; index < len(txlist)-1; index++ {
+		for index := 0; index <= len(txlist)-1; index++ {
 			var currenttx = txlist[index].(map[string]interface{})
-			if currenttx["to"] == address {
+			if currenttx["to"].(string) == wallet {
 				rtx++
-				if addrweightmap[currenttx["from"].(string)] != nil {
-					i, err := strconv.Atoi(addrweightmap[currenttx["from"].(string)].(string))
-					if err != nil {
-						fmt.Println("Weird Conversion")
-					}
-					currentscore = currentscore + i
-				}
-			} else {
+			} else if currenttx["from"].(string) == wallet {
 				stx++
-				if addrweightmap[currenttx["to"].(string)] != nil {
-					i, err := strconv.Atoi(addrweightmap[currenttx["to"].(string)].(string))
-					if err != nil {
-						fmt.Println(err)
-					}
-					currentscore = currentscore + i
-				}
 			}
 		}
 	}
-	var uniquetokens map[string]bool
-	uniquetokens = make(map[string]bool)
-	/*
-		var lastqblock int
-		var currentqblock int
-		lastqblock = 0
-		currentqblock = 0
-		var quickswap bool
-		quickswap = false
-	*/
-	for index := 0; index < len(txlist)-1; index++ {
-		var currenttx = Erc20[index].(map[string]interface{})
-		/*
-			if addrweightmap[currenttx["contractAddress"].(string)] == "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff" {
-				currentqblock, err = strconv.Atoi(addrweightmap[currenttx["blockNumber"].(string)].(string))
-				if currentqblock - 15
-
-			}
-		*/
-		if addrweightmap[currenttx["contractAddress"].(string)] != nil {
-			uniquetokens[addrweightmap[currenttx["contractAddress"].(string)].(string)] = true
-			i, err := strconv.Atoi(addrweightmap[currenttx["contractAddress"].(string)].(string))
-			memblurbs = append(memblurbs, blurbmap[currenttx["contractAddress"].(string)].(string))
-			if err != nil {
-				fmt.Println("Weird Conversion")
-			}
-			currentscore = currentscore + i
-		}
-	}
-	if len(uniquetokens) > 9 {
-		currentscore = currentscore + 100 // Token Connoisseur
-		trophycase.Token_connoisseur = true
-	}
-	var NFTcount map[string]bool
-	NFTcount = make(map[string]bool)
-	if len(Erc721) > 0 {
-		currentscore = currentscore + 10 // NFT Holder
-		trophycase.NFTHolder = true
-		for index := 0; index < len(txlist)-1; index++ {
-			var currenttx = Erc721[index].(map[string]interface{})
-			if addrweightmap[currenttx["contractAddress"].(string)] != nil {
-				NFTcount[addrweightmap[currenttx["contractAddress"].(string)].(string)] = true
-				i, err := strconv.Atoi(addrweightmap[currenttx["contractAddress"].(string)].(string))
-				if err != nil {
-					fmt.Println("Weird Conversion")
-				}
-				currentscore = currentscore + i
-			}
-
-		}
-	}
-	if len(NFTcount) > 10 {
-		currentscore = currentscore + 25 // NFT Collector
-		trophycase.NFTCollector = true
-	}
-	var accuratebal int
-	accuratebal, err = strconv.Atoi(walletMatic)
-	var maticbal float64 = float64(accuratebal) / float64(1000000000000000000)
-	if maticbal >= 600 {
-		currentscore = currentscore + 100 // Memo - Top 10,000 Matic Holder
-		trophycase.Toptenk = true
-	}
-	if stx > rtx {
-		currentscore = currentscore + 55 // Giver
+	// Use rtx and stx to determine achievement
+	if rtx < stx {
+		maniacScore = maniacScore + 55 // Giver
 		trophycase.Giver = true
 	} else if rtx > stx {
-		currentscore = currentscore + 50 //Reciever
+		maniacScore = maniacScore + 50 //Reciever
 		trophycase.Reciever = true
 	} else if rtx == stx && rtx >= 1 {
-		currentscore = currentscore + 100 //Zen
+		maniacScore = maniacScore + 100 //Zen
 		trophycase.Zen = true
 	}
-	trophycase.TotalScore = currentscore
-	trophycase.Coinblurb = removeDuplicateValues(memblurbs)
+	/*
+		Next get Maniac Score for interacting with ERC721s
+	*/
+	if len(ERC721) >= 1 {
+		maniacScore += 10 // NFT Holder
+		trophycase.NFTHolder = true
+		for index := 0; index <= len(ERC721)-1; index++ {
+			var currenttx = ERC721[index].(map[string]interface{})
+			NFTcount[currenttx["contractAddress"].(string)] = true
+		}
+		if len(NFTcount) > 9 {
+			maniacScore += 25 // NFT Collector
+			trophycase.NFTCollector = true
+		}
+	}
+	compareval := new(big.Int)
+	compareval, ok := compareval.SetString("600000000000000000000", 10)
+	if !ok {
+		fmt.Println("SetString: error")
+	}
+	if getBalance(wallet).Cmp(compareval) == 1 {
+		trophycase.Toptenk = true
+		maniacScore += 100
+	}
+	Coinblurb = removeDuplicateValues(Coinblurb)
+	trophycase.Coinblurb = Coinblurb
+	trophycase.TotalScore = maniacScore
 	return trophycase
 }
+
 func main() {
 	fs := http.FileServer(http.Dir("static/"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
@@ -236,7 +217,6 @@ func ShowDashboard(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(walletach.Coinblurb)
 	tmpl.Execute(w, walletach)
 }
 func ShowLanding(w http.ResponseWriter, r *http.Request) {
